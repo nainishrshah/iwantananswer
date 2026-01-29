@@ -72,9 +72,7 @@ const updateStatus = async (id, status) => {
       Test Client
     </button>
 
-    <h2>Unanswered Questions</h2>
-
-      <h2>Unanswered Questions</h2>
+          <h2>Unanswered Questions</h2>
 
       {questions.length === 0 ? (
         <p>No unanswered questions 🎉</p>
