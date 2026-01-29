@@ -10,67 +10,63 @@ const supabase = createClient(
 
 export default function AdminPage() {
   const [questions, setQuestions] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [answer, setAnswer] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchQuestions = async () => {
+      const { data, error } = await supabase
+        .from("questions")
+        .select(`
+          id,
+          content,
+          created_at,
+          answers ( id )
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching questions:", error);
+      } else {
+        // show only unanswered questions
+        const unanswered = data.filter(
+          (q) => !q.answers || q.answers.length === 0
+        );
+        setQuestions(unanswered);
+      }
+
+      setLoading(false);
+    };
+
     fetchQuestions();
   }, []);
 
-  async function fetchQuestions() {
-    const { data, error } = await supabase
-      .from("questions")
-      .select("*")
-      .eq("answered", false)
-      .order("created_at", { ascending: true });
-
-    if (!error) setQuestions(data);
-  }
-
-  async function submitAnswer() {
-    await supabase
-      .from("questions")
-      .update({ answer, answered: true })
-      .eq("id", selected.id);
-
-    setSelected(null);
-    setAnswer("");
-    fetchQuestions();
-  }
-
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: "20px" }}>
       <h1>Admin Panel</h1>
+      <h2>Unanswered Questions</h2>
 
-      {!selected && (
-        <>
-          <h2>Unanswered Questions</h2>
-          {questions.map(q => (
-            <div
-              key={q.id}
-              style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}
-            >
-              <p>{q.question}</p>
-              <button onClick={() => setSelected(q)}>Answer</button>
-            </div>
-          ))}
-        </>
+      {loading && <p>Loading...</p>}
+
+      {!loading && questions.length === 0 && (
+        <p>No unanswered questions 🎉</p>
       )}
 
-      {selected && (
-        <>
-          <h2>Answer Question</h2>
-          <p><strong>Q:</strong> {selected.question}</p>
-          <textarea
-            value={answer}
-            onChange={e => setAnswer(e.target.value)}
-            rows={5}
-            style={{ width: "100%" }}
-          />
-          <br /><br />
-          <button onClick={submitAnswer}>Submit Answer</button>
-        </>
-      )}
+      {!loading &&
+        questions.map((q) => (
+          <div
+            key={q.id}
+            style={{
+              border: "1px solid #ccc",
+              padding: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <p><strong>Question:</strong> {q.content}</p>
+            <p style={{ fontSize: "12px", color: "#666" }}>
+              Asked on {new Date(q.created_at).toLocaleString()}
+            </p>
+          </div>
+        ))}
     </div>
   );
 }
