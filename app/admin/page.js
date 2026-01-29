@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminPage() {
+console.log("ADMIN PAGE LOADED");
+
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("FETCHING QUESTIONS...");
+
     const fetchQuestions = async () => {
       const { data, error } = await supabase
         .from("questions")
@@ -23,15 +22,15 @@ export default function AdminPage() {
           answers ( id )
         `)
         .order("created_at", { ascending: false });
+        console.log("RAW DATA:", data);
+
 
       if (error) {
-        console.error("Error fetching questions:", error);
+        console.error(error);
       } else {
-        // show only unanswered questions
-        const unanswered = data.filter(
-          (q) => !q.answers || q.answers.length === 0
-        );
-        setQuestions(unanswered);
+        // unanswered = no related answers
+      setQuestions(data);
+
       }
 
       setLoading(false);
@@ -40,33 +39,31 @@ export default function AdminPage() {
     fetchQuestions();
   }, []);
 
+  if (loading) return <p>Loading...</p>;
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Admin Panel</h1>
+  <div>
+    <h1>Admin Panel</h1>
+
+    <button
+      onClick={() => console.log("CLIENT JS IS RUNNING")}
+    >
+      Test Client
+    </button>
+
+    <h2>Unanswered Questions</h2>
+
       <h2>Unanswered Questions</h2>
 
-      {loading && <p>Loading...</p>}
-
-      {!loading && questions.length === 0 && (
+      {questions.length === 0 ? (
         <p>No unanswered questions 🎉</p>
+      ) : (
+        <ul>
+          {questions.map((q) => (
+            <li key={q.id}>{q.content}</li>
+          ))}
+        </ul>
       )}
-
-      {!loading &&
-        questions.map((q) => (
-          <div
-            key={q.id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <p><strong>Question:</strong> {q.content}</p>
-            <p style={{ fontSize: "12px", color: "#666" }}>
-              Asked on {new Date(q.created_at).toLocaleString()}
-            </p>
-          </div>
-        ))}
     </div>
   );
 }
