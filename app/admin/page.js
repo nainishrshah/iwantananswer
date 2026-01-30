@@ -1,11 +1,11 @@
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export default async function AdminPage() {
   console.log("ADMIN PAGE LOADED (SERVER)");
 
-const { data: questions, error } = await supabaseAdmin
-  .from("questions")
-  .select("*");
-
+  const { data: questions, error } = await supabaseAdmin
+    .from("questions")
+    .select("*");
 
   if (error) {
     console.error("Error fetching questions:", error);
@@ -25,7 +25,6 @@ const { data: questions, error } = await supabaseAdmin
             <li key={q.id} style={{ marginBottom: "20px" }}>
               <p>{q.content}</p>
 
-              {/* Buttons intentionally disabled for now */}
               <button disabled style={{ marginRight: "10px" }}>
                 ✅ Approve
               </button>
