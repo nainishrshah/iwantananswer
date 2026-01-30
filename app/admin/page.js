@@ -1,12 +1,10 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export default async function AdminPage() {
   console.log("ADMIN PAGE LOADED (SERVER)");
 
-  const { data: questions, error } = await supabaseAdmin
+const { data: questions, error } = await supabaseAdmin
   .from("questions")
-  .select("*")
-  .order("created_at", { ascending: false });
+  .select("*");
 
 
   if (error) {
