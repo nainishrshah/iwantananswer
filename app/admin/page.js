@@ -1,15 +1,12 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
 export default async function AdminPage() {
   console.log("ADMIN PAGE LOADED (SERVER)");
 
-  const { data: questions, error } = await supabaseAdmin
-    .from("questions")
-    .select("*");
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/api/admin/questions`,
+    { cache: "no-store" }
+  );
 
-  if (error) {
-    console.error("Error fetching questions:", error);
-  }
+  const questions = await res.json();
 
   return (
     <div style={{ padding: "24px" }}>
