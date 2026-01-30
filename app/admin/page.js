@@ -1,13 +1,9 @@
 export default async function AdminPage() {
   console.log("ADMIN PAGE LOADED (SERVER)");
 
-  const res = await fetch(
-    `${process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000"
-    }/api/admin/questions`,
-    { cache: "no-store" }
-  );
+  const res = await fetch("/api/admin/questions", {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     const text = await res.text();
