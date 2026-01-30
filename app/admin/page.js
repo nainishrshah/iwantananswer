@@ -2,9 +2,23 @@ export default async function AdminPage() {
   console.log("ADMIN PAGE LOADED (SERVER)");
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/api/admin/questions`,
+    `${process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000"
+    }/api/admin/questions`,
     { cache: "no-store" }
   );
+
+  if (!res.ok) {
+    const text = await res.text();
+    return (
+      <div style={{ padding: "24px" }}>
+        <h1>Admin Panel</h1>
+        <p>Failed to load questions</p>
+        <pre>{text}</pre>
+      </div>
+    );
+  }
 
   const questions = await res.json();
 
