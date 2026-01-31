@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 export async function GET() {
   const { data, error } = await supabaseAdmin
@@ -8,7 +13,6 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("API error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

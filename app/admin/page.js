@@ -1,9 +1,12 @@
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-  const res = await fetch('/api/admin/questions', {
-    cache: 'no-store',
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/questions`,
+    {
+      cache: 'no-store',
+    }
+  );
 
   if (!res.ok) {
     throw new Error('Failed to fetch questions');
