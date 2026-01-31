@@ -1,47 +1,29 @@
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPage() {
-  console.log("ADMIN PAGE LOADED (SERVER)");
-
-  const res = await fetch("http://localhost:3000/api/admin/questions", {
-  cache: "no-store",
-});
-
+  const res = await fetch('/api/admin/questions', {
+    cache: 'no-store',
+  });
 
   if (!res.ok) {
-    const text = await res.text();
-    return (
-      <div style={{ padding: "24px" }}>
-        <h1>Admin Panel</h1>
-        <p>Failed to load questions</p>
-        <pre>{text}</pre>
-      </div>
-    );
+    throw new Error('Failed to fetch questions');
   }
 
   const questions = await res.json();
 
   return (
-    <div style={{ padding: "24px" }}>
-      <h1>Admin Panel</h1>
+    <main style={{ padding: 24 }}>
+      <h1>Admin</h1>
 
-      <h2>Unanswered Questions</h2>
+      {questions.length === 0 && <p>No questions found.</p>}
 
-      {!questions || questions.length === 0 ? (
-        <p>No unanswered questions 🎉</p>
-      ) : (
-        <ul>
-          {questions.map((q) => (
-            <li key={q.id} style={{ marginBottom: "20px" }}>
-              <p>{q.content}</p>
-
-              <button disabled style={{ marginRight: "10px" }}>
-                ✅ Approve
-              </button>
-
-              <button disabled>❌ Reject</button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+      {questions.map((q) => (
+        <div key={q.id} style={{ marginBottom: 16 }}>
+          <p><strong>Question:</strong> {q.content}</p>
+          <p>Status: {q.status}</p>
+          <hr />
+        </div>
+      ))}
+    </main>
   );
 }
